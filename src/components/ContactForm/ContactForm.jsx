@@ -1,15 +1,13 @@
 import React from 'react';
 import { Formik, Field } from 'formik';
 import PropTypes from 'prop-types';
-import {
-  Form,
-  Button,
-  ErrorMessage,
-  Label,
-  Input,
-} from '../ContactForm/ContactForm.styled';
+import { Form, Button, ErrorMessage, Label, Input } from './ContactForm.styled';
 import * as yup from 'yup';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContacts } from 'redux/selectors';
+import { nanoid } from 'nanoid';
+import { addContact } from 'redux/contactSlice';
 
 yup.addMethod(yup.string, 'validation', function () {
   return this.matches(
@@ -29,9 +27,12 @@ const Schema = yup.object().shape({
   number: yup.string().numeric().required(),
 });
 
-export const ContactForm = ({ onSubmit }) => {
+export const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
   const onChange = e => {
     const { name, value } = e.currentTarget;
@@ -46,6 +47,20 @@ export const ContactForm = ({ onSubmit }) => {
 
       default:
         break;
+    }
+  };
+  const onSubmit = ({ name, number }) => {
+    const isExist = contacts.find(contact => contact.name === name);
+    if (isExist && number) {
+      window.alert(`${name} is already in contacts`);
+      return;
+    } else {
+      const contact = {
+        id: nanoid(),
+        name,
+        number,
+      };
+      dispatch(addContact(contact));
     }
   };
 
@@ -100,76 +115,3 @@ ContactForm.propTypes = {
   onSubmit: PropTypes.func,
   onChange: PropTypes.func,
 };
-
-// class ContactForm extends Component {
-//   state = {
-//     name: '',
-//     number: '',
-//   };
-//   onChange = e => {
-//     const { name, value } = e.currentTarget;
-//     this.setState({ [name]: value });
-//   };
-//   resetForm() {
-//     this.setState(() => {
-//       return {
-//         name: '',
-//         number: '',
-//       };
-//     });
-//   }
-
-//   render() {
-//     return (
-//       <>
-//         <Formik
-//           initialValues={{ name: '', number: '' }}
-//           validationSchema={Schema}
-//           onSubmit={values => {
-//             this.props.onSubmit(values);
-//             this.resetForm();
-//           }}
-//         >
-//           <Form>
-//             <Field as={Label}>
-//               <span>Name</span>
-//               <Field
-//                 as={Input}
-//                 type="text"
-//                 name="name"
-//                 value={this.state.name}
-//                 onChange={this.onChange}
-//               />
-//               <ErrorMessage name="name" component="div" />
-//             </Field>
-//             <Field as={Label}>
-//               <span>Number</span>
-//               <Field
-//                 as={Input}
-//                 type="tel"
-//                 name="number"
-//                 value={this.state.number}
-//                 onChange={this.onChange}
-//               />
-//               <ErrorMessage name="number" component="div" />
-//             </Field>
-
-//             <Button
-//               type="submit"
-//               disabled={!this.state.name || !this.state.number}
-//             >
-//               Add contact
-//             </Button>
-//           </Form>
-//         </Formik>
-//       </>
-//     );
-//   }
-// }
-
-// export default ContactForm;
-
-// ContactForm.propTypes = {
-//   onSubmit: PropTypes.func,
-//   onChange: PropTypes.func,
-// };
