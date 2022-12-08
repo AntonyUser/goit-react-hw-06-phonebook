@@ -5,17 +5,6 @@ import { ContactForm } from './ContactForm/ContactForm';
 import { Container } from './App.styled';
 
 const App = () => {
-  // useEffect(() => {
-  //   const updatedContacts = JSON.parse(localStorage.getItem('contacts'));
-  //   if (updatedContacts) {
-  //     setContacts(updatedContacts);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem('contacts', JSON.stringify(contacts));
-  // }, [contacts]);
-
   return (
     <Container>
       <h2>Phonebook</h2>
